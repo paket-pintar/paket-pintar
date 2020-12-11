@@ -8,7 +8,7 @@ class UserController {
     const payload = { name, password, email }
     try {
       const user = await User.create(payload)
-      res.status(201).json(user)
+      res.status(201).json({id: user.id, name: user.name, email: user.email, role: user.role})
     } catch (err) {
       next(err)
     }
