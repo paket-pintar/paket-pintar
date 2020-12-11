@@ -35,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: {
           args: true,
           msg: 'Email cannot be empty!'
+        },
+        isEmail:{
+          args: true,
+          msg: 'Please use email format!'
         }
       }
     },

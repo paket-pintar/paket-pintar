@@ -19,6 +19,7 @@ app.get('/', (req,res,next) => {
 app.use(routes)
 app.use(errorHandler)
 
-app.listen(port, () => {
+/* app.listen(port, () => {
   console.log('listening to port: ' + port);
-})
+}) */
+module.exports = app
