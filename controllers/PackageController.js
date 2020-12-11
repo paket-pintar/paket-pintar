@@ -8,9 +8,9 @@ class PackageController {
       if (role === 'admin') {
         packages = await Package.findAll({ include: [User] })
       } else {
-        packages = await Package.findAll({ where: { id } })
+        packages = await Package.findAll({ where: { UserId: id } })
       }  
-      res.status(200).json({ packages })
+      res.status(200).json(packages)
     } catch (err) {
       next(err)
     }
@@ -37,19 +37,22 @@ class PackageController {
 
   static async createPackage (req, res, next) {
     const { role } = req.userLoggedIn
-    const UserId = req.body.UserId
-    const description = req.body.description
+    const { UserId, description, sender } = req.body
+    const payload = {
+      UserId, description, sender, 
+      claimed: false
+    }
+    // console.log(UserId, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< user logged in')
     try {
       if (role !== 'admin') {
         throw { msg: 'not authorized!', status: 401 }
       } else {
         const user = await User.findByPk(UserId)
         if (!user) {
-          throw { msg: 'customer not found', status: 404 }
+          throw { msg: 'customer not found!', status: 404 }
         } else {
-          const payload = { UserId, description, claimed: false }
           const newPackage = await Package.create(payload)
-          res.status(200).json(newPackage)
+          res.status(201).json(newPackage)
         }
       }
     } catch (err) {

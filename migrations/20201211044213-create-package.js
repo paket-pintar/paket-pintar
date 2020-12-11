@@ -11,6 +11,9 @@ module.exports = {
       description: {
         type: Sequelize.STRING
       },
+      sender: {
+        type: Sequelize.STRING
+      },
       claimed: {
         type: Sequelize.BOOLEAN
       },
