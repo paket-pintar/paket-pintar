@@ -15,8 +15,48 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Package.init({
-    description: DataTypes.STRING,
-    claimed: DataTypes.BOOLEAN,
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Description cannot be empty!'
+        },
+        notNull: {
+          args: true,
+          msg: 'Description cannot be null!'
+        }
+      }
+    },
+    sender: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Sender cannot be empty!'
+        },
+        notNull: {
+          args: true,
+          msg: 'Sender cannot be null!'
+        }
+      }
+    },
+    claimed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Claimed cannot be empty!'
+        },
+        notNull: {
+          args: true,
+          msg: 'Claimed cannot be null!'
+        }
+      }
+    },
     UserId: DataTypes.INTEGER
   }, {
     sequelize,

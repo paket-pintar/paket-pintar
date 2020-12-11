@@ -3,6 +3,7 @@ const { verifyToken } = require('../helpers/jwt')
 
 module.exports = async function (req, res, next) {
   const { access_token } = req.headers
+  // console.log('<<<<<<<<<<< masuk autehentication');
   try {
     if (!access_token) {
       throw { msg: 'not authenticated!', status: 401 }
