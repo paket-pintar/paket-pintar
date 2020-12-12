@@ -16,13 +16,9 @@ class UserController {
 
   static async login(req, res, next) {
     const { password, email } = req.body
-    console.log({
-      password,
-      email
-    });
     try {
       // const user = await User.create(payload)
-      if (!password || !email) {
+      if (!password && !email) {
         throw { msg: 'Password and email cannot be empty!', status: 400 }
       } else {
         const user = await User.findOne({ where: { email: email }})
