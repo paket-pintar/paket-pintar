@@ -36,7 +36,6 @@ class PackageController {
   }
 
   static async createPackage (req, res, next) {
-    const { role } = req.userLoggedIn
     const { UserId, description, sender } = req.body
     const payload = {
       UserId, description, sender, 
@@ -44,16 +43,12 @@ class PackageController {
     }
     // console.log(UserId, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< user logged in')
     try {
-      if (role !== 'admin') {
-        throw { msg: 'not authorized!', status: 401 }
+      const user = await User.findByPk(UserId)
+      if (!user) {
+        throw { msg: 'customer not found!', status: 404 }
       } else {
-        const user = await User.findByPk(UserId)
-        if (!user) {
-          throw { msg: 'customer not found!', status: 404 }
-        } else {
-          const newPackage = await Package.create(payload)
-          res.status(201).json(newPackage)
-        }
+        const newPackage = await Package.create(payload)
+        res.status(201).json(newPackage)
       }
     } catch (err) {
       next(err)
@@ -61,19 +56,15 @@ class PackageController {
   }
 
   static async updatePackage (req, res, next) {
-    const { role } = req.userLoggedIn
     const packageId = req.params.id
-    const { UserId, description, claimed } = req.body
-    const payload = { UserId, description, claimed: claimed == 'true' }
+    const { UserId, description, claimed, sender } = req.body
+    const payload = { UserId, description, sender, claimed: claimed == 'true' }
     try {
       if (isNaN(+packageId)) {
         throw { msg: 'package ID is not valid!', status: 400 }
-      } else if (role !== 'admin') {
-        throw { msg: 'not authorized!', status: 401 }
       } else {
         const updatedPackage = await Package.update(payload, { where: { id: packageId }, returning: true })
         if (updatedPackage[0] === 0) {
-          console.log(updatedPackage);
           throw { msg: 'package not found!', status: 404 }
         } else {
           res.status(200).json(updatedPackage[1][0])
@@ -85,20 +76,17 @@ class PackageController {
   }
 
   static async deletePackage (req, res, next) {
-    const { role } = req.userLoggedIn
     const packageId = req.params.id
     try {
       if (isNaN(+packageId)) {
         throw { msg: 'package ID is not valid!', status: 400 }
-      } else if (role !== 'admin') {
-        throw { msg: 'not authorized!', status: 401 }
       } else {
         const thePackage = await Package.findByPk(packageId)
         if (!thePackage) {
           throw { msg: 'package not found!', status: 404 }
         } else {
-          const deletedPackage = await Package.destroy({ where: { id: packageId }, returning: true })
-          res.status(200).json(deletedPackage)
+          await Package.destroy({ where: { id: packageId } })
+          res.status(200).json({ msg: 'package deleted succesfully!' })
         }
       }
     } catch (err) {

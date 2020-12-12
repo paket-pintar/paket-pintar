@@ -3,7 +3,7 @@ const app = require('../app')
 const { sequelize } = require('../models')
 const { queryInterface } = sequelize
 const { hashPassword } = require('../helpers/bcrypt')
-const { response } = require('express')
+// const { response } = require('express')
 
 const user = [{
     name: 'Admin',
@@ -72,7 +72,7 @@ describe('POST /register', () => {
         .then(response => {
             const { status, body } = response
             expect(status).toBe(400)
-            expect(body).toHaveProperty('msg', 'Email cannot be empty!, Please use email format!')
+            expect(body).toHaveProperty('msg', 'Email cannot be empty!')
             done()
         })
         .catch(err => {
@@ -100,7 +100,7 @@ describe('POST /register', () => {
         .then(response => {
             const { status, body } = response
             expect(status).toBe(400)
-            expect(body).toHaveProperty('msg', 'Password cannot be empty!, Password length minimum 6 characters!')
+            expect(body).toHaveProperty('msg', 'Password cannot be empty!')
             done()
         })
         .catch(err => {
@@ -115,6 +115,20 @@ describe('POST /register', () => {
             const { status, body } = response
             expect(status).toBe(400)
             expect(body).toHaveProperty('msg', 'Password length minimum 6 characters!')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })     
+    })
+    it('test register failed (email already taken)', (done) => {
+        request(app)
+        .post('/register')
+        .send({name: 'admin', email: 'admin@mail.com', password: '123456'})
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(400)
+            expect(body).toHaveProperty('msg', 'Email already taken!')
             done()
         })
         .catch(err => {
@@ -160,6 +174,21 @@ describe('POST /login', () => {
             const { status, body } = response
             expect(status).toBe(401)
             expect(body).toHaveProperty('msg', 'Email/password is wrong!')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+    
+    it('test login failed (null input email and password)', (done) => {
+        request(app)
+        .post('/login')
+        .send({email: '', password: ''})
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(400)
+            expect(body).toHaveProperty('msg', 'Password and email cannot be empty!')
             done()
         })
         .catch(err => {
