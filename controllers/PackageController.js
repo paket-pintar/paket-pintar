@@ -12,13 +12,13 @@ class PackageController {
           required: true
         }], 
           order: [
-            ['createdAt', 'DESC']
+            ['id', 'DESC']
           ],
         })
       } else {
         packages = await Package.findAll({ where: { UserId: id },
           order: [
-            ['createdAt', 'DESC']
+            ['id', 'DESC']
           ]
         })
       }  

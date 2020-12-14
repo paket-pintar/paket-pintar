@@ -17,6 +17,7 @@ module.exports = {
         password: hashPassword('customer'),
         email: 'customer@mail.com',
         role: 'customer',
+        unit: '9A / C2',
         createdAt: new Date(),
         updatedAt: new Date()
       },
