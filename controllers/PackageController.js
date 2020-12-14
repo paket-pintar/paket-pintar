@@ -4,24 +4,26 @@ class PackageController {
   static async getAllPackage (req, res, next) {
     const { id, role } = req.userLoggedIn
     let packages = null
+    let options = {
+      include: [{
+        model: User,
+        attributes: ['id', 'name', 'email'],
+        required: true
+      }], 
+      order: [
+        ['id', 'DESC']
+      ]
+    }
     try {
       if (role === 'admin') {
-        packages = await Package.findAll({ include: [{
-          model: User,
-          attributes: ['id', 'name', 'email'],
-          required: true
-        }], 
-          order: [
-            ['id', 'DESC']
-          ],
-        })
+        packages = await Package.findAll(options)
       } else {
-        packages = await Package.findAll({ where: { UserId: id },
-          order: [
-            ['id', 'DESC']
-          ]
-        })
-      }  
+        options["where"] = { UserId: id }
+        packages = await Package.findAll(options)
+      }
+      if (packages.length === 0) {
+        throw { msg: 'there is no package in the list.', status: 200}
+      }
       res.status(200).json(packages)
     } catch (err) {
       next(err)
@@ -32,21 +34,23 @@ class PackageController {
     const { id, role } = req.userLoggedIn
     const packageId = req.params.id
     try {
-      const thePackage = await Package.findByPk(packageId,{
-          include: [{
-            model: User,
-            attributes: ['id', 'name', 'email']
-          }]
-        }
-      )
       if (isNaN(+packageId)) {
         throw { msg: 'package ID is not valid!', status: 400 }
-      } else if (!thePackage) {
-        throw { msg: 'package not found!', status: 404 }
-      } else if (role === 'admin' || +id === +thePackage.UserId) {
-        res.status(200).json(thePackage)
       } else {
-        throw { msg: 'not authorized', status: 404 }
+        const thePackage = await Package.findByPk(packageId,{
+            include: [{
+              model: User,
+              attributes: ['id', 'name', 'email']
+            }]
+          }
+        )
+        if (!thePackage) {
+          throw { msg: 'package not found!', status: 404 }
+        } else if (role === 'admin' || +id === +thePackage.UserId) {
+          res.status(200).json(thePackage)
+        } else {
+          throw { msg: 'not authorized!', status: 401 }
+        }
       }
     } catch (err) {
       next(err)
@@ -114,12 +118,15 @@ class PackageController {
 
   static async claimPackage (req, res, next) {
     const packageId = req.params.id
-    const { claimed } = req.body
+    let { claimed } = req.body
+    if (typeof claimed === 'string') {
+      claimed = claimed === 'true'
+    }
     try {
       if (isNaN(+packageId)) {
         throw { msg: 'package ID is not valid!', status: 400 }
       } else {
-        const claimedPackage = await Package.update({ claimed: claimed == 'true' }, { where: { id: packageId }, returning: true })
+        const claimedPackage = await Package.update({ claimed: claimed }, { where: { id: packageId }, returning: true })
         if (claimedPackage[0] === 0) {
           throw { msg: 'package not found!', status: 404 }
         } else {

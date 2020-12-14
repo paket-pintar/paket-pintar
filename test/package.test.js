@@ -11,6 +11,7 @@ var customerImpostorToken = signToken({ email: 'impostor@mail.com', role: 'custo
 var UserId = null
 var packageId = null
 var dummyId = null
+var packageIdDummy = null
 var dummyToken = null
 
 beforeAll(done => {
@@ -86,6 +87,38 @@ afterAll ((done) => {
     })
 })
 
+describe('(failed) GET /packages', () => {
+  it('package list is empty (admin)', (done) => {
+      request(app)
+      .get('/packages')
+      .set({ access_token: adminToken })
+      .then(response => {
+          const { status, body } = response
+          expect(status).toBe(200)
+          expect(body).toEqual({ msg: 'there is no package in the list.' })
+          done()
+      })
+      .catch(err => {
+          done(err)
+      })
+  })
+  
+  it('package list is empty (customer)', (done) => {
+    request(app)
+    .get('/packages')
+    .set({ access_token: customerToken })
+    .then(response => {
+        const { status, body } = response
+        expect(status).toBe(200)
+        expect(body).toEqual({ msg: 'there is no package in the list.' })
+        done()
+    })
+    .catch(err => {
+        done(err)
+    })
+  })
+})
+
 describe('Create package, POST /packages', () => {
   test('tidak menyertakan access_token', (done) => {
     request(app)
@@ -118,10 +151,36 @@ describe('Create package, POST /packages', () => {
       .then(response => {
         let {body, status} = response
         packageId = body.id
-        expect(body).toHaveProperty('description', 'Paket hitam besar')
         expect(status).toBe(201)
+        expect(body).toHaveProperty('description', 'Paket hitam besar')
+        expect(body).toHaveProperty('id', packageId)
         expect(body).toHaveProperty('sender', 'JNE')
         expect(body).toHaveProperty('UserId', UserId)
+        expect(body).toHaveProperty('claimed', false)
+        done()
+      })
+      .catch(err => {
+        done(err)
+      })
+  });
+
+  test('success create package(2)', (done) => {
+    request(app)
+      .post('/packages')
+      .send({
+        description: 'Paket 15x15cm',
+        sender: 'TIKI',
+        UserId: dummyId
+      })
+      .set({ access_token: adminToken })
+      .then(response => {
+        let {body, status} = response
+        packageIdDummy = body.id
+        expect(status).toBe(201)
+        expect(body).toHaveProperty('description', 'Paket 15x15cm')
+        expect(body).toHaveProperty('id', packageIdDummy)
+        expect(body).toHaveProperty('sender', 'TIKI')
+        expect(body).toHaveProperty('UserId', dummyId)
         expect(body).toHaveProperty('claimed', false)
         done()
       })
@@ -286,79 +345,120 @@ describe('Get all Package, GET /packages', () => {
         done(err)
       })
   })
-})
 
-
-describe('Get package by id, GET /packages:id', () => {
-  // it('get package with admin token (success)', (done) => {
-  //     request(app)
-  //     .get('/packages/' + packageId)
-  //     .set({ access_token: adminToken })
+  // test('customer succes get packages', (done) => {
+  //   request(app)
+  //     .get('/packages')
+  //     .set({ access_token: dummyToken })
   //     .then(response => {
-  //         const { status, body } = response
-  //         expect(status).toBe(200)
-  //         expect(body).toEqual({
-  //           id: packageId,
-  //           description: expect.any(String),
-  //           sender: expect.any(String),
-  //           claimed: expect.any(Boolean),
-  //           UserId: UserId,
-  //           createdAt: expect.any(String),
-  //           updatedAt: expect.any(String),
-  //           User: {
-  //             id: 4,
-  //             name: "customer",
-  //             email: "customer@mail.com"
-  //           }
-  //         })
-  //         done()
+  //       let { body, status } = response
+  //       expect(status).toBe(200)
+  //       expect(body).toHaveProperty('description', 'Paket 15x15cm!')
+  //       done()
   //     })
   //     .catch(err => {
-  //         done(err)
+  //       done(err)
   //     })
   // })
-  it('get package with not authorized user (failed)', (done) => {
+})
+
+describe('Get package by id, GET /packages:id', () => {
+  it('get package with admin token (success)', (done) => {
       request(app)
       .get('/packages/' + packageId)
-      .set({ access_token: dummyToken })
+      .set({ access_token: adminToken })
       .then(response => {
           const { status, body } = response
-          expect(status).toBe(401)
-          expect(body).toEqual({ msg: 'not authorized!' })
+          expect(status).toBe(200)
+          expect(body).toEqual({
+            id: packageId,
+            description: 'Paket hitam besar',
+            sender: 'JNE',
+            claimed: false,
+            UserId: UserId,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+            User: {
+              id: UserId,
+              name: "customer",
+              email: "customer@mail.com"
+            }
+          })
           done()
       })
       .catch(err => {
           done(err)
       })
   })
-  // it('package not found (failed)', (done) => {
-  //     request(app)
-  //     .get('/packages/' + (packageId + 10))
-  //     .set({ access_token: adminToken })
-  //     .then(response => {
-  //         const { status, body } = response
-  //         expect(status).toBe(404)
-  //         expect(body).toEqual({ msg: 'package not found!' })
-  //         done()
-  //     })
-  //     .catch(err => {
-  //         done(err)
-  //     })
-  // })
-  // it('package id not valid (failed)', (done) => {
-  //     request(app)
-  //     .get('/packages/' + packageId + 's')
-  //     .set({ access_token: adminToken })
-  //     .then(response => {
-  //         const { status, body } = response
-  //         expect(status).toBe(400)
-  //         expect(body).toEqual({ msg: 'package ID is not valid!' })
-  //         done()
-  //     })
-  //     .catch(err => {
-  //         done(err)
-  //     })
-  // })
+  it('get package with customer token (success)', (done) => {
+    request(app)
+    .get('/packages/' + packageId)
+    .set({ access_token: customerToken })
+    .then(response => {
+        const { status, body } = response
+        expect(status).toBe(200)
+        expect(body).toEqual({
+          id: packageId,
+          description: 'Paket hitam besar',
+          sender: 'JNE',
+          claimed: false,
+          UserId: UserId,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+          User: {
+            id: UserId,
+            name: "customer",
+            email: "customer@mail.com"
+          }
+        })
+        done()
+    })
+    .catch(err => {
+        done(err)
+    })
+  })
+  it('get package with not authorized user (failed)', (done) => {
+    request(app)
+    .get('/packages/' + packageId)
+    .set({ access_token: dummyToken })
+    .then(response => {
+        const { status, body } = response
+        expect(status).toBe(401)
+        expect(body).toEqual({ msg: 'not authorized!' })
+        done()
+    })
+    .catch(err => {
+        done(err)
+    })
+  })
+  it('package not found (failed)', (done) => {
+      request(app)
+      .get('/packages/' + (packageId + 10))
+      .set({ access_token: adminToken })
+      .then(response => {
+          const { status, body } = response
+          expect(status).toBe(404)
+          expect(body).toEqual({ msg: 'package not found!' })
+          done()
+      })
+      .catch(err => {
+          done(err)
+      })
+  })
+  it('package id is not a number (failed)', (done) => {
+      request(app)
+      .get(`/packages/${packageId}sss`)
+      .set({ access_token: adminToken })
+      .then(response => {
+          const { status, body } = response
+          expect(status).toBe(400)
+          expect(body).toEqual({ msg: 'package ID is not valid!' })
+          done()
+      })
+      .catch(err => {
+          done(err)
+      })
+  })
 })
 
 describe('Update package, PUT /packages', () => {
@@ -449,26 +549,74 @@ describe('Update package, PUT /packages', () => {
   });
 });
 
-// describe('arrayContaining', () => {
-//   const expected = ['Alice', 'Bob'];
-//   it('matches even if received contains additional elements', () => {
-//     expect(['Alice', 'Bob', 'Eve']).toEqual(expect.arrayContaining(expected));
-//   });
-//   it('does not match if received does not contain expected elements', () => {
-//     expect(['Bob', 'Eve']).not.toEqual(expect.arrayContaining(expected));
-//   });
-// });
+describe('Claim package, PATCH /packages', () => {
+  test('package ID is not integer', (done) => {
+    request(app)
+      .patch('/packages/3s')
+      .send({
+        claimed: true
+      })
+      .set({ access_token: adminToken })
+      .then(response => {
+        let {body, status} = response
+        expect(status).toBe(400)
+        expect(body).toHaveProperty('msg', 'package ID is not valid!')
+        done()
+      })
+      .catch(err => {
+        done(err)
+      })
+  });
 
+  test('package not found', (done) => {
+    request(app)
+      .patch(`/packages/${packageId + 100}` )
+      .send({
+        claimed: true
+      })
+      .set({ access_token: adminToken })
+      .then(response => {
+        let {body, status} = response
+        expect(status).toBe(404)
+        expect(body).toHaveProperty('msg', 'package not found!')
+        done()
+      })
+      .catch(err => {
+        done(err)
+      })
+  });
 
-describe('Delete package, Delete /packages', () => {
+  test('success claimed', (done) => {
+    request(app)
+      .patch(`/packages/${packageId}` )
+      .send({
+        claimed: 'true'
+      })
+      .set({ access_token: adminToken })
+      .then(response => {
+        let {body, status} = response
+        expect(status).toBe(200)
+        expect(body).toEqual({
+          id: packageId,
+          description: 'Ukuran 30cm x 30cm, fragile',
+          sender: 'SI LAMBAT',
+          claimed: true,
+          UserId: UserId,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String)
+        })
+        done()
+      })
+      .catch(err => {
+        done(err)
+      })
+  });
+})
+
+describe('Delete package, DELETE /packages', () => {
   test('package ID is not integer', (done) => {
     request(app)
       .delete('/packages/3s')
-      .send({
-        description: 'Paket hitam besar',
-        sender: 'JNE',
-        UserId: UserId
-      })
       .set({ access_token: adminToken })
       .then(response => {
         let {body, status} = response
