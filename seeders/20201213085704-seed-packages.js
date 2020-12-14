@@ -7,7 +7,7 @@ module.exports = {
         description: 'Paket Hitam dari JNE',
         sender: 'Tidak tercantum',
         claimed: false,
-        UserId: 3,
+        UserId: 2,
         createdAt : new Date(),
         updatedAt: new Date()
       },
@@ -15,7 +15,7 @@ module.exports = {
         description: 'Besar coklat dari Gojek',
         sender: 'Toko X',
         claimed: false,
-        UserId: 3,
+        UserId: 2,
         createdAt : new Date(),
         updatedAt: new Date()
       },
@@ -23,7 +23,7 @@ module.exports = {
         description: 'Surat kartu kredit',
         sender: 'Udin',
         claimed: true,
-        UserId: 3,
+        UserId: 2,
         createdAt : new Date(),
         updatedAt: new Date()
       }
@@ -31,12 +31,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
     await queryInterface.bulkDelete('Packages', null, {})
   }
 };
