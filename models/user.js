@@ -56,6 +56,16 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+    unit: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Unit cannot be empty!'
+        }
+      }
+    },
     role: {
       type: DataTypes.STRING,
       allowNull: false

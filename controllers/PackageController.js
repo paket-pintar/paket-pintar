@@ -6,9 +6,21 @@ class PackageController {
     let packages = null
     try {
       if (role === 'admin') {
-        packages = await Package.findAll({ include: [User] })
+        packages = await Package.findAll({ include: [{
+          model: User,
+          attributes: ['id', 'name', 'email'],
+          required: true
+        }], 
+          order: [
+            ['createdAt', 'DESC']
+          ],
+        })
       } else {
-        packages = await Package.findAll({ where: { UserId: id } })
+        packages = await Package.findAll({ where: { UserId: id },
+          order: [
+            ['createdAt', 'DESC']
+          ]
+        })
       }  
       res.status(200).json(packages)
     } catch (err) {
@@ -20,11 +32,17 @@ class PackageController {
     const { id, role } = req.userLoggedIn
     const packageId = req.params.id
     try {
-      const thePackage = await Package.findByPk(packageId)
+      const thePackage = await Package.findByPk(packageId,{
+          include: [{
+            model: User,
+            attributes: ['id', 'name', 'email']
+          }]
+        }
+      )
       if (isNaN(+packageId)) {
         throw { msg: 'package ID is not valid!', status: 400 }
       } else if (!thePackage) {
-        throw { msg: 'not found!', status: 404 }
+        throw { msg: 'package not found!', status: 404 }
       } else if (role === 'admin' || +id === +thePackage.UserId) {
         res.status(200).json(thePackage)
       } else {
@@ -41,7 +59,7 @@ class PackageController {
       UserId, description, sender, 
       claimed: false
     }
-    // console.log(UserId, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< user logged in')
+    
     try {
       const user = await User.findByPk(UserId)
       if (!user) {
@@ -87,6 +105,25 @@ class PackageController {
         } else {
           await Package.destroy({ where: { id: packageId } })
           res.status(200).json({ msg: 'package deleted succesfully!' })
+        }
+      }
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  static async claimPackage (req, res, next) {
+    const packageId = req.params.id
+    const { claimed } = req.body
+    try {
+      if (isNaN(+packageId)) {
+        throw { msg: 'package ID is not valid!', status: 400 }
+      } else {
+        const claimedPackage = await Package.update({ claimed: claimed == 'true' }, { where: { id: packageId }, returning: true })
+        if (claimedPackage[0] === 0) {
+          throw { msg: 'package not found!', status: 404 }
+        } else {
+          res.status(200).json(claimedPackage[1][0])
         }
       }
     } catch (err) {
