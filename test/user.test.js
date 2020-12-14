@@ -11,20 +11,11 @@ var dummyId = null
 
 const user = [
     {
-        name: 'Admin',
+        name: 'admin',
         email: 'admin@mail.com',
         password: hashPassword('123456'),
         role: 'admin',
         unit: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-    },
-    {
-        name: 'dummy',
-        email: 'dummy@mail.com',
-        password: hashPassword('qweqwe'),
-        role: 'customer',
-        unit: '-',
         createdAt: new Date(),
         updatedAt: new Date()
     }
@@ -33,10 +24,6 @@ const user = [
 beforeAll((done) => {
     queryInterface.bulkInsert('Users', user, {})
         .then(() => {
-            return (User.findOne({ where: { email: 'dummy@mail.com' } }))
-        })
-        .then((user) => {
-            dummyId = user.id 
             done()
         })
         .catch(err => {
@@ -54,6 +41,86 @@ afterAll((done) => {
         })
 })
 
+describe('POST /login-admin', () => {
+    it('test admin login success', (done) => {
+        request(app)
+        .post('/login-admin')
+        .send({email: 'admin@mail.com', password: '123456'})
+        .then(response => {
+            const { status, body } = response
+            adminToken = body.access_token
+            expect(status).toBe(200)
+            expect(body).toHaveProperty('access_token', expect.any(String))
+            expect(body).toHaveProperty('email', 'admin@mail.com')
+            expect(body).toHaveProperty('role', 'admin')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+    it('test login failed (wrong email)', (done) => {
+        request(app)
+        .post('/login-admin')
+        .send({email: 'tidakada@mail.com', password: '123456'})
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(401)
+            expect(body).toHaveProperty('msg', 'Email/password is wrong!')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+    it('test login failed (wrong password)', (done) => {
+        request(app)
+        .post('/login-admin')
+        .send({email: 'admin@mail.com', password: '123457'})
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(401)
+            expect(body).toHaveProperty('msg', 'Email/password is wrong!')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+    
+    it('test login failed (null input email and password)', (done) => {
+        request(app)
+        .post('/login-admin')
+        .send({email: '', password: ''})
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(400)
+            expect(body).toHaveProperty('msg', 'Password and email cannot be empty!')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+})
+
+describe('(failed) GET /users', () => {
+    it('user list is empty (failed)', (done) => {
+        request(app)
+        .get('/users')
+        .set({ access_token: adminToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(200)
+            expect(body).toEqual({ msg: 'there is no user in the list.' })
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+})
+
 describe('POST /register', () => {
     it('test register success', (done) => {
         request(app)
@@ -64,9 +131,32 @@ describe('POST /register', () => {
             customerId = body.id
             expect(status).toBe(201)
             expect(body).toHaveProperty("id", expect.any(Number))
-            expect(body).toHaveProperty("name", expect.any(String))
-            expect(body).toHaveProperty("email", expect.any(String))
-            expect(body).toHaveProperty("unit", expect.any(String))   
+            expect(body).toHaveProperty("name", 'customer')
+            expect(body).toHaveProperty("email", 'customer@mail.com')
+            expect(body).toHaveProperty("unit", '9A / C2')   
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+    it('test register success (second)', (done) => {
+        request(app)
+        .post('/register')
+        .send({
+            name: 'dummy',
+            email: 'dummy@mail.com',
+            password: 'qweqwe',
+            unit: '-'
+        })
+        .then(response => {
+            const { status, body } = response
+            dummyId = body.id
+            expect(status).toBe(201)
+            expect(body).toHaveProperty("id", expect.any(Number))
+            expect(body).toHaveProperty("name", 'dummy')
+            expect(body).toHaveProperty("email", 'dummy@mail.com')
+            expect(body).toHaveProperty("unit", '-')   
             done()
         })
         .catch(err => {
@@ -159,67 +249,6 @@ describe('POST /register', () => {
     })
 })
 
-describe('POST /login-admin', () => {
-    it('test admin login success', (done) => {
-        request(app)
-        .post('/login-admin')
-        .send({email: 'admin@mail.com', password: '123456'})
-        .then(response => {
-            const { status, body } = response
-            adminToken = body.access_token
-            expect(status).toBe(200)
-            expect(body).toHaveProperty('access_token', expect.any(String))
-            done()
-        })
-        .catch(err => {
-            done(err)
-        })
-    })
-    it('test login failed (wrong email)', (done) => {
-        request(app)
-        .post('/login-admin')
-        .send({email: 'tidakada@mail.com', password: '123456'})
-        .then(response => {
-            const { status, body } = response
-            expect(status).toBe(401)
-            expect(body).toHaveProperty('msg', 'Email/password is wrong!')
-            done()
-        })
-        .catch(err => {
-            done(err)
-        })
-    })
-    it('test login failed (wrong password)', (done) => {
-        request(app)
-        .post('/login-admin')
-        .send({email: 'admin@mail.com', password: '123457'})
-        .then(response => {
-            const { status, body } = response
-            expect(status).toBe(401)
-            expect(body).toHaveProperty('msg', 'Email/password is wrong!')
-            done()
-        })
-        .catch(err => {
-            done(err)
-        })
-    })
-    
-    it('test login failed (null input email and password)', (done) => {
-        request(app)
-        .post('/login-admin')
-        .send({email: '', password: ''})
-        .then(response => {
-            const { status, body } = response
-            expect(status).toBe(400)
-            expect(body).toHaveProperty('msg', 'Password and email cannot be empty!')
-            done()
-        })
-        .catch(err => {
-            done(err)
-        })
-    })
-})
-
 describe('POST /login-user', () => {
     it('test user login success', (done) => {
         request(app)
@@ -230,6 +259,8 @@ describe('POST /login-user', () => {
             customerToken = body.access_token
             expect(status).toBe(200)
             expect(body).toHaveProperty('access_token', expect.any(String))
+            expect(body).toHaveProperty('role', 'customer')
+            expect(body).toHaveProperty('email', 'customer@mail.com')
             done()
         })
         .catch(err => {
@@ -344,46 +375,68 @@ describe('Get user by id, GET /users:id', () => {
             done(err)
         })
     })
-    // it('customer get other user (failed)', (done) => {
-    //     request(app)
-    //     .get('/users/' + dummyId)
-    //     .set({ access_token: customerToken })
-    //     .then(response => {
-    //         const { status, body } = response
-    //         expect(status).toBe(401)
-    //         expect(body).toEqual({ msg: 'not authorized!' })
-    //         done()
-    //     })
-    //     .catch(err => {
-    //         done(err)
-    //     })
-    // })
-    // it('user not found (failed)', (done) => {
-    //     request(app)
-    //     .get('/users/' + (customerId + 100))
-    //     .set({ access_token: adminToken })
-    //     .then(response => {
-    //         const { status, body } = response
-    //         expect(status).toBe(404)
-    //         expect(body).toEqual({ msg: 'user not found!' })
-    //         done()
-    //     })
-    //     .catch(err => {
-    //         done(err)
-    //     })
-    // })
-    // it('user id not valid (failed)', (done) => {
-    //     request(app)
-    //     .get('/users/' + customerId + 's')
-    //     .set({ access_token: adminToken })
-    //     .then(response => {
-    //         const { status, body } = response
-    //         expect(status).toBe(400)
-    //         expect(body).toEqual({ msg: 'user ID is not valid!' })
-    //         done()
-    //     })
-    //     .catch(err => {
-    //         done(err)
-    //     })
-    // })
+    it('customer get his/her own user info', (done) => {
+        request(app)
+        .get('/users/' + customerId)
+        .set({ access_token: customerToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(200)
+            expect(body).toEqual({
+                id: customerId,
+                name: "customer",
+                email: "customer@mail.com",
+                unit: "9A / C2",
+                role: "customer",
+                updatedAt: expect.any(String),
+                createdAt: expect.any(String)
+            })
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+    it('customer get other user (failed)', (done) => {
+        request(app)
+        .get('/users/' + dummyId)
+        .set({ access_token: customerToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(401)
+            expect(body).toEqual({ msg: 'not authorized!' })
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+    it('user not found (failed)', (done) => {
+        request(app)
+        .get('/users/' + (customerId + 100))
+        .set({ access_token: adminToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(404)
+            expect(body).toEqual({ msg: 'user not found!' })
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+    it('user id not valid (failed)', (done) => {
+        request(app)
+        .get('/users/' + customerId + 's')
+        .set({ access_token: adminToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(400)
+            expect(body).toEqual({ msg: 'user ID is not valid!' })
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
 })

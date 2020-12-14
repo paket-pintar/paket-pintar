@@ -80,22 +80,24 @@ class UserController {
         ],
         attributes: ['id', 'name', 'email', 'unit']
       })
-      res.status(200).json(users)
+      if (users.length === 0) {
+        throw { msg: 'there is no user in the list.', status: 200}
+      } else {
+        res.status(200).json(users)
+      }
     } catch (err) {
       next(err)
     }
   }
 
   static async getUserById(req, res, next) {
-    const UserId = +req.params.id
-    const { id, role } = req.userLoggedIn
+    const id = +req.params.id
+    const { id: UserId, role } = req.userLoggedIn
     try {
-      if (isNaN(+id)) {
+      if (isNaN(id)) {
         throw { msg: 'user ID is not valid!', status: 400 }
       } else {
-        if (UserId !== id && role !== 'admin') {
-          throw { msg: 'not authorized!', status: 400 }
-        } else {
+        if (UserId == id || role === 'admin') {
           const user = await User.findByPk(id, 
             { attributes: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt', 'unit'] 
           })
@@ -104,6 +106,8 @@ class UserController {
           } else {
             res.status(200).json(user)
           }
+        } else {
+          throw { msg: 'not authorized!', status: 401 }
         }
       }
     } catch (err) {
