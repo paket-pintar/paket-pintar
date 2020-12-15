@@ -4,6 +4,7 @@ const adminAuthorization = require('../middlewares/adminAuthorization')
 
 router.get('/', adminAuthorization, UserController.getAllUsers)
 router.get('/:id', UserController.getUserById)
-
+router.post('/send-notification', UserController.sendNotification)
+router.put('/register-token/:id', UserController.registerToken)
 
 module.exports = router

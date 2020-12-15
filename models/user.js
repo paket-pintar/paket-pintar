@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 
-const { hashPassword } =require('../helpers/bcrypt')
+const { hashPassword } = require('../helpers/bcrypt')
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
           args: true,
           msg: 'Email cannot be empty!'
         },
-        isEmail:{
+        isEmail: {
           args: true,
           msg: 'Please use email format!'
         }
@@ -69,6 +69,10 @@ module.exports = (sequelize, DataTypes) => {
     role: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    userToken: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     hooks: {
