@@ -6,6 +6,7 @@ router.get('/', PackageController.getAllPackage)
 router.get('/:id', PackageController.getPackageById)
 router.post('/', adminAuthorization, PackageController.createPackage)
 router.put('/:id', adminAuthorization, PackageController.updatePackage)
+router.patch('/', adminAuthorization, PackageController.claimAllPackageByUserId)
 router.patch('/:id', adminAuthorization, PackageController.claimPackage)
 router.delete('/:id', adminAuthorization, PackageController.deletePackage)
 

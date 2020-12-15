@@ -21,9 +21,9 @@ class PackageController {
         options["where"] = { UserId: id }
         packages = await Package.findAll(options)
       }
-      if (packages.length === 0) {
-        throw { msg: 'there is no package in the list.', status: 200}
-      }
+      // if (packages.length === 0) {
+      //   throw { msg: 'there is no package in the list.', status: 200}
+      // }
       res.status(200).json(packages)
     } catch (err) {
       next(err)
@@ -131,6 +131,25 @@ class PackageController {
           throw { msg: 'package not found!', status: 404 }
         } else {
           res.status(200).json(claimedPackage[1][0])
+        }
+      }
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  static async claimAllPackageByUserId (req, res, next) {
+    let { UserId } = req.body
+    try {
+      if (isNaN(+UserId)) {
+        throw { msg: 'UserId is not valid!', status: 400 }
+      } else {
+        const user = await User.findByPk(UserId)
+        if (!user) {
+          throw { msg: 'user not found!', status: 404 }
+        } else {
+          const claimedPackage = await Package.update({ claimed: true }, { where: { UserId, claimed: false }, returning: true })
+          res.status(200).json(claimedPackage)
         }
       }
     } catch (err) {

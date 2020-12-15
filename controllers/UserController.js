@@ -33,7 +33,9 @@ class UserController {
         } else if (user.role === 'customer' && checkPassword(password, user.password)) {
           const payload = {
             email: user.email,
-            role: user.role
+            name: user.name,
+            unit: user.unit,
+            id: user.id
           }
           const access_token = signToken(payload)
           res.status(200).json({ ...payload, access_token })
