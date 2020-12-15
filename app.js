@@ -13,14 +13,14 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.get('/', (req,res) => {
-  res.send('Welcome to Paket Pintar API')
+  res.status(200).json('Welcome to Paket Pintar API')
 })
 
 app.use(routes)
 app.use(errorHandler)
 
-// app.listen(port, () => {
-//   console.log('listening to port: ' + port);
-// })
+app.listen(port, () => {
+  console.log('listening to port: ' + port);
+})
 
 module.exports = app
