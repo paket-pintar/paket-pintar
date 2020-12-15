@@ -1,4 +1,4 @@
-const { User, Package } = require('../models')
+const { User, Package, History } = require('../models')
 
 class PackageController {
   static async getAllPackage (req, res, next) {
@@ -149,7 +149,23 @@ class PackageController {
           throw { msg: 'user not found!', status: 404 }
         } else {
           const claimedPackage = await Package.update({ claimed: true }, { where: { UserId, claimed: false }, returning: true })
-          res.status(200).json(claimedPackage)
+          if (claimedPackage[0] === 0) {
+            throw { msg: 'no package claimed!'}
+          } else {
+            const payload = claimedPackage[1].map(pack => {
+              return {
+                name: user.name,
+                email: user.email,
+                unit: user.unit,
+                description: pack.description,
+                sender: pack.sender,
+                UserId: user.id,
+                PackageId: pack.id,
+              }
+            })
+            const histories = await History.bulkCreate(payload)
+            res.status(200).json(histories)
+          }
         }
       }
     } catch (err) {
