@@ -43,6 +43,20 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+    receiver: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Receiver cannot be empty!'
+        },
+        notNull: {
+          args: true,
+          msg: 'Receiver cannot be null!'
+        }
+      }
+    },
     claimed: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

@@ -7,6 +7,7 @@ module.exports = {
         description: 'Paket Hitam dari JNE',
         sender: 'Tidak tercantum',
         claimed: false,
+        receiver: 'Desta',
         UserId: 2,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -15,6 +16,7 @@ module.exports = {
         description: 'Besar coklat dari Gojek',
         sender: 'Toko X',
         claimed: false,
+        receiver: 'Desta',
         UserId: 2,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -23,6 +25,7 @@ module.exports = {
         description: 'Kecil merah dari JNE',
         sender: 'Pak Jambul',
         claimed: false,
+        receiver: 'Desta',
         UserId: 3,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -31,6 +34,7 @@ module.exports = {
         description: 'Hitam sedang dari JNE',
         sender: 'Tokopedia',
         claimed: true,
+        receiver: 'Desta',
         UserId: 3,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -39,6 +43,7 @@ module.exports = {
         description: 'Kulkas Silver',
         sender: 'Shoppee',
         claimed: false,
+        receiver: 'Desta',
         UserId: 10,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -47,6 +52,7 @@ module.exports = {
         description: 'Amplop coklat',
         sender: 'Ibu RT',
         claimed: true,
+        receiver: 'Desta',
         UserId: 3,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -55,6 +61,7 @@ module.exports = {
         description: 'Hitam sedang dari JNE',
         sender: 'Tokopedia',
         claimed: false,
+        receiver: 'Desta',
         UserId: 4,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -63,6 +70,7 @@ module.exports = {
         description: 'Matras Kuning',
         sender: 'BliBli',
         claimed: false,
+        receiver: 'Desta',
         UserId: 4,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -71,6 +79,7 @@ module.exports = {
         description: 'Amplop coklat',
         sender: 'Ibu RT',
         claimed: true,
+        receiver: 'Desta',
         UserId: 4,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -79,6 +88,7 @@ module.exports = {
         description: 'Tas Gucci',
         sender: 'Andrea',
         claimed: false,
+        receiver: 'Desta',
         UserId: 5,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -87,6 +97,7 @@ module.exports = {
         description: 'Karung Beras',
         sender: 'BliBli',
         claimed: false,
+        receiver: 'Desta',
         UserId: 16,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -95,6 +106,7 @@ module.exports = {
         description: 'Amplop coklat',
         sender: 'Ibu RT',
         claimed: false,
+        receiver: 'Desta',
         UserId: 5,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -103,6 +115,7 @@ module.exports = {
         description: 'Paket Kotak Kayu',
         sender: 'Tokopedia',
         claimed: false,
+        receiver: 'Desta',
         UserId: 6,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -111,6 +124,7 @@ module.exports = {
         description: 'Kotak Merah Kecil',
         sender: 'BliBli',
         claimed: false,
+        receiver: 'Desta',
         UserId: 6,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -119,6 +133,7 @@ module.exports = {
         description: 'Amplop coklat',
         sender: 'Ibu RT',
         claimed: false,
+        receiver: 'Desta',
         UserId: 6,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -127,6 +142,7 @@ module.exports = {
         description: 'Besar coklat dari Gojek',
         sender: 'Toko X',
         claimed: false,
+        receiver: 'Desta',
         UserId: 2,
         createdAt : new Date(),
         updatedAt: new Date()
@@ -135,6 +151,7 @@ module.exports = {
         description: 'Surat kartu kredit',
         sender: 'Udin',
         claimed: true,
+        receiver: 'Desta',
         UserId: 2,
         createdAt : new Date(),
         updatedAt: new Date()
