@@ -58,9 +58,9 @@ class PackageController {
   }
 
   static async createPackage (req, res, next) {
-    const { UserId, description, sender } = req.body
+    const { UserId, description, sender, receiver } = req.body
     const payload = {
-      UserId, description, sender, 
+      UserId, description, sender, receiver,
       claimed: false
     }
     
@@ -79,8 +79,8 @@ class PackageController {
 
   static async updatePackage (req, res, next) {
     const packageId = req.params.id
-    const { UserId, description, claimed, sender } = req.body
-    const payload = { UserId, description, sender, claimed: claimed == 'true' }
+    const { UserId, description, claimed, sender, receiver } = req.body
+    const payload = { UserId, description, sender, receiver, claimed: claimed == 'true' }
     try {
       if (isNaN(+packageId)) {
         throw { msg: 'package ID is not valid!', status: 400 }
