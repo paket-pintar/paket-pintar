@@ -11,8 +11,8 @@ module.exports = {
         role: 'admin',
         createdAt: new Date(),
         updatedAt: new Date()
-      },
-
+      }
+      
   ], {});
   },
 
