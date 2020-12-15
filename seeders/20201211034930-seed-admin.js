@@ -12,15 +12,6 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       },
-      {
-        name: 'customer',
-        password: hashPassword('customer'),
-        email: 'customer@mail.com',
-        role: 'customer',
-        unit: '9A / C2',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
 
   ], {});
   },
