@@ -39,7 +39,7 @@ module.exports = {
         description: 'Kulkas Silver',
         sender: 'Shoppee',
         claimed: false,
-        UserId: 3,
+        UserId: 10,
         createdAt : new Date(),
         updatedAt: new Date()
       },
@@ -87,7 +87,7 @@ module.exports = {
         description: 'Karung Beras',
         sender: 'BliBli',
         claimed: false,
-        UserId: 5,
+        UserId: 16,
         createdAt : new Date(),
         updatedAt: new Date()
       },
