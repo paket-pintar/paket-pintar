@@ -7,7 +7,7 @@ class PackageController {
     let options = {
       include: [{
         model: User,
-        attributes: ['id', 'name', 'email'],
+        attributes: ['id', 'name', 'email', 'unit'],
         required: true
       }], 
       order: [
