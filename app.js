@@ -12,8 +12,8 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.get('/', (req, res, next) => {
-  res.send('Welcome to Paket Pintar API')
+app.get('/', (req, res) => {
+  res.status(200).json('Welcome to Paket Pintar API')
 })
 
 app.use(routes)
