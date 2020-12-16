@@ -82,7 +82,7 @@ class UserController {
         order: [
           ['createdAt', 'DESC']
         ],
-        attributes: ['id', 'name', 'email', 'unit']
+        attributes: ['id', 'name', 'email', 'unit', 'userToken']
       })
       if (users.length === 0) {
         throw { msg: 'there is no user in the list.', status: 200 }
@@ -104,7 +104,7 @@ class UserController {
         if (UserId == id || role === 'admin') {
           const user = await User.findByPk(id,
             {
-              attributes: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt', 'unit']
+              attributes: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt', 'unit', 'userToken']
             })
           if (!user) {
             throw { msg: 'user not found!', status: 404 }
@@ -127,7 +127,7 @@ class UserController {
     try {
       if (isNaN(id)) {
         throw { msg: 'user ID is not valid!', status: 400 }
-      } else if (!userToken.includes('ExponentPushToken')) {
+      } else if (!userToken || !userToken.includes('ExponentPushToken')) {
         throw { msg: 'expo token is not valid!', status: 400 }
       } else {
         const user = await User.update({ userToken }, { where: { id }, returning: true })
@@ -138,12 +138,14 @@ class UserController {
         }
       }
     } catch (error) {
+      console.log('gagal register expoToken');
+      console.log(error);
       next(error)
     }
   }
 
   static async sendNotification(req, res, next) {
-    let { description, sender, userId } = req.body
+    let { message, userId } = req.body
     // console.log('req.body:', description, sender, userId);
     try {
       let user = await User.findByPk(userId)
@@ -152,13 +154,7 @@ class UserController {
       } else {
         let token = user.userToken
   
-        const message = {
-          to: token,
-          sound: 'default',
-          title: `Kiriman dari: ${sender}`,
-          body: description,
-          data: { description, sender },
-        };
+        message['to'] = token
         let dataFeedback = await axios({
           url: 'https://exp.host/--/api/v2/push/send',
           method: 'POST',
