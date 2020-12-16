@@ -259,8 +259,10 @@ describe('POST /login-user', () => {
             customerToken = body.access_token
             expect(status).toBe(200)
             expect(body).toHaveProperty('access_token', expect.any(String))
-            expect(body).toHaveProperty('role', 'customer')
             expect(body).toHaveProperty('email', 'customer@mail.com')
+            expect(body).toHaveProperty('name', 'customer')
+            expect(body).toHaveProperty('unit', '9A / C2')
+            expect(body).toHaveProperty('id', customerId)
             done()
         })
         .catch(err => {
@@ -433,6 +435,118 @@ describe('Get user by id, GET /users:id', () => {
             const { status, body } = response
             expect(status).toBe(400)
             expect(body).toEqual({ msg: 'user ID is not valid!' })
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+})
+
+// ExponentPushToken
+describe('register token, PUT /users/register-token/:id', () => {
+    it('success register token (success)', (done) => {
+        request(app)
+        .put('/users/register-token/' + customerId)
+        .send({userToken: 'ExponentPushToken[h38YMIC-3v8pKEXvjuOB-O]'})
+        .set({ access_token: adminToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(200)
+            expect(body).toHaveProperty('msg', 'Register user token success!')
+            expect(body).toHaveProperty('userToken', 'ExponentPushToken[h38YMIC-3v8pKEXvjuOB-O]')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+
+    it('user Id is not valid (failed)', (done) => {
+        request(app)
+        .put('/users/register-token/sasd' + customerId)
+        .send({userToken: 'ExponentPushToken[h38YMIC-3v8pKEXvjuOB-O]'})
+        .set({ access_token: adminToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(400)
+            expect(body).toHaveProperty('msg', 'user ID is not valid!')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+
+    it('expo token is not valid (failed)', (done) => {
+        request(app)
+        .put('/users/register-token/' + customerId)
+        .send({userToken: '[h38YMIC-3v8pKEXvjuOB-O]'})
+        .set({ access_token: adminToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(400)
+            expect(body).toHaveProperty('msg', 'expo token is not valid!')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+
+    it('user not found! (failed)', (done) => {
+        request(app)
+        .put('/users/register-token/' + (customerId + 100))
+        .send({userToken: 'ExponentPushToken[h38YMIC-3v8pKEXvjuOB-O]'})
+        .set({ access_token: adminToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(404)
+            expect(body).toHaveProperty('msg', 'user not found!')
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
+    })
+})
+
+describe('register token, PUT /users/send-notification', () => {
+    // it('send-notification (success)', (done) => {
+    //     request(app)
+    //     .post('/users/send-notification')
+    //     .send({
+    //         sender: 'GoFood',
+    //         receiver: 'Pak Desta',
+    //         description: 'Masakan padang',
+    //         userId: customerId
+    //     })
+    //     .set({ access_token: adminToken })
+    //     .then(response => {
+    //         const { status, body } = response
+    //         // expect(body).toHaveProperty('msg', 'Register user token success!')
+    //         expect(status).toBe(200)
+    //         done()
+    //     })
+    //     .catch(err => {
+    //         done(err)
+    //     })
+    // })
+
+    it('user not found (failed)', (done) => {
+        request(app)
+        .post('/users/send-notification')
+        .send({
+            sender: 'GoFood',
+            receiver: 'Pak Desta',
+            description: 'Masakan padang',
+            userId: customerId + 100
+        })
+        .set({ access_token: adminToken })
+        .then(response => {
+            const { status, body } = response
+            expect(status).toBe(404)
+            expect(body).toHaveProperty('msg', 'user not found!')
             done()
         })
         .catch(err => {

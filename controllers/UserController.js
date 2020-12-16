@@ -121,15 +121,23 @@ class UserController {
   }
 
   static async registerToken(req, res, next) {
-    const id = req.params.id
+    const id = +req.params.id
     const userToken = req.body.userToken
 
     try {
-      await User.update({ userToken }, { where: { id } })
-      // console.log(success);
-      res.status(200).json({ msg: 'Register user token success!' })
+      if (isNaN(id)) {
+        throw { msg: 'user ID is not valid!', status: 400 }
+      } else if (!userToken.includes('ExponentPushToken')) {
+        throw { msg: 'expo token is not valid!', status: 400 }
+      } else {
+        const user = await User.update({ userToken }, { where: { id }, returning: true })
+        if (user[0] === 0) {
+          throw { msg: 'user not found!', status: 404 }
+        } else {
+          res.status(200).json({ msg: 'Register user token success!', userToken })
+        }
+      }
     } catch (error) {
-      console.log(error);
       next(error)
     }
   }
@@ -138,29 +146,33 @@ class UserController {
     let { description, sender, userId } = req.body
     // console.log('req.body:', description, sender, userId);
     try {
-      let user = await User.findOne({ where: { id: userId } })
-      let token = user.userToken
-
-      const message = {
-        to: token,
-        sound: 'default',
-        title: `Kiriman dari: ${sender}`,
-        body: description,
-        data: { description, sender },
-      };
-      let dataFeedback = await axios({
-        url: 'https://exp.host/--/api/v2/push/send',
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Accept-encoding': 'gzip, deflate',
-          'Content-Type': 'application/json',
-        },
-        data: JSON.stringify(message),
-      });
-      // console.log(dataFeedback);
-      // console.log('dataFeedback.config', dataFeedback.config.data);
-      res.status(200).json(dataFeedback.config.data)
+      let user = await User.findByPk(userId)
+      if (!user) {
+        throw { msg: 'user not found!', status: 404 }
+      } else {
+        let token = user.userToken
+  
+        const message = {
+          to: token,
+          sound: 'default',
+          title: `Kiriman dari: ${sender}`,
+          body: description,
+          data: { description, sender },
+        };
+        let dataFeedback = await axios({
+          url: 'https://exp.host/--/api/v2/push/send',
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+          },
+          data: JSON.stringify(message),
+        });
+        // console.log(dataFeedback);
+        console.log('dataFeedback.config', dataFeedback.config.data);
+        res.status(200).json(dataFeedback.config.data)
+      }
     } catch (error) {
       console.log(error);
       next(error)
