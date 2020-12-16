@@ -324,11 +324,10 @@ describe('GET /users', () => {
             const { status, body } = response
             const expected = [
                 {
-                    id: customerId,
-                    name: "customer",
-                    email: "customer@mail.com",
-                    unit: "9A / C2",
-                    userToken: null
+                    "id": customerId,
+                    "name": "customer",
+                    "email": "customer@mail.com",
+                    "unit": "9A / C2"
                 }
             ];
             expect(status).toBe(200)
@@ -356,7 +355,7 @@ describe('GET /users', () => {
 })
 
 describe('Get user by id, GET /users:id', () => {
-    it('get user success', (done) => {
+    it('get users success', (done) => {
         request(app)
         .get('/users/' + customerId)
         .set({ access_token: adminToken })
@@ -369,7 +368,6 @@ describe('Get user by id, GET /users:id', () => {
                 email: "customer@mail.com",
                 unit: "9A / C2",
                 role: "customer",
-                userToken: null,
                 updatedAt: expect.any(String),
                 createdAt: expect.any(String)
             })
@@ -392,7 +390,6 @@ describe('Get user by id, GET /users:id', () => {
                 email: "customer@mail.com",
                 unit: "9A / C2",
                 role: "customer",
-                userToken: null,
                 updatedAt: expect.any(String),
                 createdAt: expect.any(String)
             })
