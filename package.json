@@ -1,0 +1,36 @@
+{
+  "name": "paket-pintar-admin-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --detectOpenHandles --forceExit --runInBand --verbose --coverage",
+    "dev": "nodemon ./bin/www",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paket-pintar/paket-pintar-admin-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/paket-pintar/paket-pintar-admin-server/issues"
+  },
+  "homepage": "https://github.com/paket-pintar/paket-pintar-admin-server#readme",
+  "devDependencies": {
+    "jest": "^26.6.3",
+    "supertest": "^6.0.1"
+  },
+  "dependencies": {
+    "axios": "^0.21.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.5.1",
+    "sequelize": "^6.3.5"
+  }
+}
